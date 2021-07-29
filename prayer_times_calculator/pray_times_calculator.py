@@ -4,33 +4,15 @@ import requests
 
 from .exceptions import CalculationMethodError, InvalidResponseError
 
+from .const import (
+    TIMINGS_URL,
+    CALCULATION_METHODS,
+    SCHOOLS,
+    MIDNIGHT_MODES,
+    LAT_ADJ_METHODS
+)
 
 class PrayerTimesCalculator:
-
-    API_URL = "http://api.aladhan.com/timings"
-
-    CALCULATION_METHODS = {
-        "jafari": 0,
-        "karachi": 1,
-        "isna": 2,
-        "mwl": 3,
-        "makkah": 4,
-        "egypt": 5,
-        "tehran": 7,
-        "gulf": 8,
-        "kuwait": 9,
-        "qatar": 10,
-        "singapore": 11,
-        "france": 12,
-        "turkey": 13,
-        "russia": 14,
-        "custom": 99,
-    }
-
-    SCHOOLS = {"shafi": 0, "hanafi": 1}
-    MIDNIGHT_MODES = {"standard": 0, "jafari": 1}
-    LAT_ADJ_METHODS = {"middle of the night": 1, "one seventh": 2, "angle based": 3}
-
     def __init__(
         self,
         latitude: float,
@@ -55,36 +37,36 @@ class PrayerTimesCalculator:
         isha_angle = "",
     ):
 
-        if calculation_method.lower() not in self.CALCULATION_METHODS:
+        if calculation_method.lower() not in CALCULATION_METHODS:
             raise CalculationMethodError(
                 "\nInvalid Calculation Method.  Must "
-                "be one of: {}".format(", ".join(self.CALCULATION_METHODS.keys()))
+                "be one of: {}".format(", ".join(CALCULATION_METHODS.keys()))
             )
-        if school and school.lower() not in self.SCHOOLS:
+        if school and school.lower() not in SCHOOLS:
             raise CalculationMethodError(
                 "\nInvalid School. Must "
-                "be one of: {}".format(", ".join(self.SCHOOLS.keys()))
+                "be one of: {}".format(", ".join(SCHOOLS.keys()))
             )
-        if midnightMode and midnightMode.lower() not in self.MIDNIGHT_MODES:
+        if midnightMode and midnightMode.lower() not in MIDNIGHT_MODES:
             raise CalculationMethodError(
                 "\nInvalid midnightMode. Must "
-                "be one of: {}".format(", ".join(self.MIDNIGHT_MODES.keys()))
+                "be one of: {}".format(", ".join(MIDNIGHT_MODES.keys()))
             )
         if (
             latitudeAdjustmentMethod
-            and latitudeAdjustmentMethod.lower() not in self.LAT_ADJ_METHODS
+            and latitudeAdjustmentMethod.lower() not in LAT_ADJ_METHODS
         ):
             raise CalculationMethodError(
                 "\nInvalid latitudeAdjustmentMethod. Must "
-                "be one of: {}".format(", ".join(self.LAT_ADJ_METHODS.keys()))
+                "be one of: {}".format(", ".join(LAT_ADJ_METHODS.keys()))
             )
 
         self._latitude = latitude
         self._longitude = longitude
-        self._calculation_method = self.CALCULATION_METHODS[calculation_method.lower()]
-        self._school = self.SCHOOLS.get(school.lower())
-        self._midnight_mode = self.MIDNIGHT_MODES.get(midnightMode.lower())
-        self._lat_adj_method = self.LAT_ADJ_METHODS.get(
+        self._calculation_method = CALCULATION_METHODS[calculation_method.lower()]
+        self._school = SCHOOLS.get(school.lower())
+        self._midnight_mode = MIDNIGHT_MODES.get(midnightMode.lower())
+        self._lat_adj_method = LAT_ADJ_METHODS.get(
             latitudeAdjustmentMethod.lower()
         )
         if tune is True:
@@ -112,7 +94,7 @@ class PrayerTimesCalculator:
 
     def fetch_prayer_times(self):
         """Return prayer times for defined parameters."""
-        url = f"{self.API_URL}/{self._timestamp}"
+        url = f"{TIMINGS_URL}/{self._timestamp}"
         params = {
             "latitude": self._latitude,
             "longitude": self._longitude,
